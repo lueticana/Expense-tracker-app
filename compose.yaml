@@ -1,0 +1,88 @@
+services:
+  uporabniki_storitev:
+    build:
+      context: ./1uporabniki-storitev
+    container_name: uporabniki_storitev
+    ports:
+      - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_user:5432/uporabniki
+      - JWT_SECRET_KEY=my_jwt_secret_key
+    depends_on:
+      - db_user
+
+  skupine_storitev:
+    build:
+      context: ./2skupine-storitev
+    container_name: skupine_storitev
+    ports:
+      - "5001:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_group:5432/skupine
+      - JWT_SECRET_KEY=my_jwt_secret_key
+    depends_on:
+      - db_group
+
+  stroski_storitev:
+    build:
+      context: ./3stroski-storitev
+    container_name: stroski_storitev
+    ports:
+      - "5002:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_expense:5432/stroski
+      - JWT_SECRET_KEY=my_jwt_secret_key
+    depends_on:
+      - db_expense
+
+  analiza_storitev:
+    build:
+      context: ./4analiza-storitev
+    container_name: analiza_storitev
+    ports:
+      - "5003:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_analysis:5432/analiza
+      - JWT_SECRET_KEY=my_jwt_secret_key
+    depends_on:
+      - db_analysis
+
+  db_user:
+    image: postgres:17
+    container_name: db_uporabniki
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123121
+      POSTGRES_DB: uporabniki
+    ports:
+      - "5433:5432"
+
+  db_group:
+    image: postgres:17
+    container_name: db_skupine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123121
+      POSTGRES_DB: skupine
+    ports:
+      - "5434:5432"
+
+  db_expense:
+    image: postgres:17
+    container_name: db_stroski
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123121
+      POSTGRES_DB: stroski
+    ports:
+      - "5435:5432"
+
+  db_analysis:
+    image: postgres:17
+    container_name: db_analiza
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123121
+      POSTGRES_DB: analiza
+    ports:
+      - "5436:5432"
