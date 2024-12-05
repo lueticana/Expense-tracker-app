@@ -11,5 +11,7 @@ Programi in ogrodja: python, flask, Docker, Postman
 ## Build
 
 Docker:
+
   docker compose build
+  
   docker compose up
