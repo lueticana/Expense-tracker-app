@@ -13,7 +13,7 @@ app.config['JWT_SECRET_KEY'] = 'my_jwt_secret_key'
 db.init_app(app)
 jwt = JWTManager(app)
 
-# Routes
+
 @app.route('/register', methods=['POST'])
 def register_user():
     data = request.json
@@ -25,7 +25,7 @@ def register_user():
         return jsonify({"error": "Email already exists"}), 400
 
     new_user = User(username=username, email=email)
-    new_user.set_password(password)  # Hash the password
+    new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User registered successfully"}), 201
@@ -50,6 +50,15 @@ def login_user():
 def get_profile():
     current_user = get_jwt_identity()
     return jsonify(current_user), 200
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute('SELECT 1')
+        return jsonify({"status": "healthy"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
 
 if __name__ == '__main__':

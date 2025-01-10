@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uporabniki-deployment
+  labels:
+    app: uporabniki
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: uporabniki
+  template:
+    metadata:
+      labels:
+        app: uporabniki
+    spec:
+      containers:
+      - name: uporabniki
+        image: al96152/uporabniki:v1.0
+        ports:
+        - containerPort: 5000
