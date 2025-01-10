@@ -28,7 +28,7 @@ def create_group():
     return jsonify({"message": "Group created successfully"}), 201
 
 
-@app.route('/groups/<int:group_id>/add-member', methods=['POST'])
+@app.route('/groups/<int:group_id>', methods=['POST'])
 @jwt_required()
 def add_member(group_id):
     data = request.json
@@ -61,6 +61,15 @@ def get_group(group_id):
         "group_name": group.group_name,
         "members": members_list 
     }), 200
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute('SELECT 1')
+        return jsonify({"status": "healthy"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
 
 if __name__ == '__main__':

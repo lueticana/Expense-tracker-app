@@ -20,5 +20,14 @@ def total_expenses():
     return jsonify({"total_expenses": 0}), 200
 
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        db.session.execute('SELECT 1')
+        return jsonify({"status": "healthy"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5003)
