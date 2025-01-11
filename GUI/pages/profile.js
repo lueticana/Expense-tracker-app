@@ -6,7 +6,7 @@ export default function MyProfile() {
     const [data, setData] = useState([{}])
     
         useEffect(() => {
-            fetch("/profile_mock").then(
+            fetch("/health").then(
                 res => res.json()
             ).then(
                 data => {

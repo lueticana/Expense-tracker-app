@@ -1,7 +1,8 @@
 services:
   uporabniki_storitev:
     build:
-      context: ./1uporabniki-storitev
+      context: ./services/1uporabniki-storitev
+      dockerfile: ./config/Dockerfile
     container_name: uporabniki_storitev
     ports:
       - "5000:5000"
@@ -13,7 +14,8 @@ services:
 
   skupine_storitev:
     build:
-      context: ./2skupine-storitev
+      context: ./services/2skupine-storitev
+      dockerfile: ./config/Dockerfile
     container_name: skupine_storitev
     ports:
       - "5001:5000"
@@ -25,7 +27,8 @@ services:
 
   stroski_storitev:
     build:
-      context: ./3stroski-storitev
+      context: ./services/3stroski-storitev
+      dockerfile: ./config/Dockerfile
     container_name: stroski_storitev
     ports:
       - "5002:5000"
@@ -37,7 +40,8 @@ services:
 
   analiza_storitev:
     build:
-      context: ./4analiza-storitev
+      context: ./services/4analiza-storitev
+      dockerfile: ./config/Dockerfile
     container_name: analiza_storitev
     ports:
       - "5003:5000"
