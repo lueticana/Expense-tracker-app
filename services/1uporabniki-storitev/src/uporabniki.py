@@ -44,6 +44,10 @@ def login_user():
 
     return jsonify({"error": "Invalid credentials"}), 401
 
+@app.route('/profile_mock')
+def get_profile():
+    return jsonify({"message": "your profile"}), 200
+
 
 @app.route('/profile', methods=['GET'])
 @jwt_required()

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models import db, Group, GroupMember
 
 app = Flask(__name__)
@@ -14,6 +14,16 @@ db.init_app(app)
 jwt = JWTManager(app)
 
 # Routes
+@app.route('/', methods=['GET'])
+def groups():
+    current_user = get_jwt_identity()
+    
+
+    groups = GroupMember.query.filter_by(user_id=current_user)
+
+    return jsonify(groups), 200
+
+
 @app.route('/groups', methods=['POST'])
 def create_group():
     data = request.json
