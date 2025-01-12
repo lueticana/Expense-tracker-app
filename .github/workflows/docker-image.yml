@@ -22,6 +22,5 @@ jobs:
 
       - name: Build and push images with Docker Compose
         run: |
-          cd ..
-          docker compose build
-          docker compose push
+          docker-compose -f ../compose.yaml build
+          docker-compose -f ../compose.yaml push
