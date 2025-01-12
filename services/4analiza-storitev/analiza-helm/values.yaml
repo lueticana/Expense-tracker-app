@@ -1,0 +1,25 @@
+replicas: 2
+image:
+  repository: al96152/analiza
+  tag: latest
+service:
+  port: 5003
+  type: ClusterIP
+
+livenessProbe:
+  httpGet:
+    path: /health    # Endpoint for liveness probe
+    port: 5003
+  initialDelaySeconds: 10
+  periodSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /readiness # Endpoint for readiness probe
+    port: 5003
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+env:
+  - name: DATABASE_URL
+    value: 'postgresql://postgres:123121@db_analysis:5432/analiza'

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stroski-deployment
+  labels:
+    app: stroski
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stroski
+  template:
+    metadata:
+      labels:
+        app: stroski
+    spec:
+      containers:
+      - name: stroski
+        image: al96152/stroski:v1.0
+        ports:
+        - containerPort: 5002
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 5002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
