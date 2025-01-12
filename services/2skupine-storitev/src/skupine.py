@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify, Response
 from sqlalchemy import text
 from models import db, Group, GroupMember
 from prometheus_client import generate_latest, Counter, Histogram
+import time
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_group:5432/skupine'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_skupine:5432/skupine'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # metrics
@@ -22,11 +25,12 @@ db.init_app(app)
 @app.before_request
 def before_request():
     REQUEST_COUNT.labels(method=request.method, endpoint=request.path).inc()
-    request.start_time = REQUEST_LATENCY.labels(endpoint=request.path).time()
+    request.start_time = time.time()
 
 @app.after_request
 def after_request(response):
-    request.start_time.observe_duration()
+    elapsed_time = time.time() - request.start_time
+    REQUEST_LATENCY.labels(endpoint=request.path).observe(elapsed_time)
     return response
 
 # home
@@ -34,9 +38,17 @@ def after_request(response):
 def home():
     return jsonify({"message": "Groups page"}), 201
 
-# create group
-@app.route('/groups', methods=['POST'])
-def create_group():
+# get groups
+@app.route('/groups', methods=['GET'])
+def get_skupine():
+    try:
+        skupine = Group.query.all()
+        if not skupine:
+            return jsonify({"message": "No groups found"}), 404
+        return jsonify([skupina.to_dict() for skupina in skupine])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     # data = request.json
     # group_name = data.get('group_name')
 
@@ -47,7 +59,7 @@ def create_group():
     # db.session.add(new_group)
     # db.session.commit()
     # return jsonify({"message": "Group created successfully"}), 201
-    return jsonify({"message": "Add group page"}), 201
+    # return jsonify({"message": "Add group page", "group": group}), 201
 
 # health: can it execute in db
 @app.route('/health', methods=['GET'])

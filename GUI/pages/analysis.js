@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react"
 import Link from 'next/link';
 
-export default function MyProfile() {
+export default function Analysis() {
 
     const [data, setData] = useState([{}])
     
         useEffect(() => {
-            fetch("http://localhost:5000/profile"
+            fetch("http://localhost:5003/analysis"
             ).then(
                 res => res.json()
             ).then(
@@ -20,9 +20,10 @@ export default function MyProfile() {
 
     return (
     <>
-    <h1>My profile</h1>
+    <h1>Analysis</h1>
     <div>
         {data.message}
+        TO DO
     </div>
     <h2>
         <Link href="/">Back to home</Link>

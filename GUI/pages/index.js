@@ -17,7 +17,35 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Go to <Link href="/profile">my profile!</Link>
+          Go to 
+          </p>
+          <p className={styles.description}>
+          <Link href="/profile">
+            <button style={{ padding: "10px 20px", cursor: "pointer" }}>
+            my profile
+            </button>
+        </Link>
+        </p>
+        <p className={styles.description}>
+        <Link href="/groups">
+            <button style={{ padding: "10px 20px", cursor: "pointer" }}>
+            my groups
+            </button>
+        </Link>
+        </p>
+        <p className={styles.description}>
+        <Link href="/expenses">
+            <button style={{ padding: "10px 20px", cursor: "pointer" }}>
+            my expenses
+            </button>
+        </Link>
+        </p>
+        <p className={styles.description}>
+        <Link href="/analysis">
+            <button style={{ padding: "10px 20px", cursor: "pointer" }}>
+            analysis
+            </button>
+        </Link>
         </p>
 
         

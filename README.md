@@ -78,8 +78,6 @@ helm install prometheus ./helm/prometheus
 ```
 
 ## Run the React GUI
-Be sure the proxy in package.json is set to point to your backend services.
-Run the dev server:
 ```bash
 cd GUI
 npm install

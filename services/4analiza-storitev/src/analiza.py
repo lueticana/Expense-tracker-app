@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify, Response
 from sqlalchemy import text
 from models import db
 from prometheus_client import generate_latest, Counter, Histogram
+import time
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_analysis:5432/analiza'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_analiza:5432/analiza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # metrics
@@ -22,11 +25,12 @@ db.init_app(app)
 @app.before_request
 def before_request():
     REQUEST_COUNT.labels(method=request.method, endpoint=request.path).inc()
-    request.start_time = REQUEST_LATENCY.labels(endpoint=request.path).time()
+    request.start_time = time.time()
 
 @app.after_request
 def after_request(response):
-    request.start_time.observe_duration()
+    elapsed_time = time.time() - request.start_time
+    REQUEST_LATENCY.labels(endpoint=request.path).observe(elapsed_time)
     return response
 
 # home
