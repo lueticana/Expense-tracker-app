@@ -17,7 +17,7 @@ jobs:
         
       - name: List directory contents for debugging
         run: |
-            ls -la /home/runner/work/Expense-tracker-app/
+            ls -la /home/runner/work/Expense-tracker-app/Expense-tracker-app/
 
       - name: Set up Docker Compose
         uses: docker/setup-qemu-action@v2
