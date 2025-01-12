@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react"
 import Link from 'next/link';
 
-export default function MyProfile() {
+export default function MyGroups() {
 
     const [data, setData] = useState([{}])
     
         useEffect(() => {
-            fetch("http://localhost:5000/profile"
+            fetch("http://localhost:5001/groups"
             ).then(
                 res => res.json()
             ).then(
@@ -20,7 +20,7 @@ export default function MyProfile() {
 
     return (
     <>
-    <h1>My profile</h1>
+    <h1>My groups</h1>
     <div>
         {data.message}
     </div>

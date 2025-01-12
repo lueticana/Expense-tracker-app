@@ -7,10 +7,9 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_user:5432/uporabniki
-      - JWT_SECRET_KEY=my_jwt_secret_key
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_uporabniki:5432/uporabniki
     depends_on:
-      - db_user
+      - db_uporabniki
 
   skupine_storitev:
     build:
@@ -18,12 +17,11 @@ services:
       dockerfile: ./config/Dockerfile
     container_name: skupine_storitev
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_group:5432/skupine
-      - JWT_SECRET_KEY=my_jwt_secret_key
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_skupine:5432/skupine
     depends_on:
-      - db_group
+      - db_skupine
 
   stroski_storitev:
     build:
@@ -31,12 +29,11 @@ services:
       dockerfile: ./config/Dockerfile
     container_name: stroski_storitev
     ports:
-      - "5002:5000"
+      - "5002:5002"
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_expense:5432/stroski
-      - JWT_SECRET_KEY=my_jwt_secret_key
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_stroski:5432/stroski
     depends_on:
-      - db_expense
+      - db_stroski
 
   analiza_storitev:
     build:
@@ -44,14 +41,13 @@ services:
       dockerfile: ./config/Dockerfile
     container_name: analiza_storitev
     ports:
-      - "5003:5000"
+      - "5003:5003"
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_analysis:5432/analiza
-      - JWT_SECRET_KEY=my_jwt_secret_key
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:123121@db_analiza:5432/analiza
     depends_on:
-      - db_analysis
+      - db_analiza
 
-  db_user:
+  db_uporabniki:
     image: postgres:17
     container_name: db_uporabniki
     environment:
@@ -61,7 +57,7 @@ services:
     ports:
       - "5433:5432"
 
-  db_group:
+  db_skupine:
     image: postgres:17
     container_name: db_skupine
     environment:
@@ -71,7 +67,7 @@ services:
     ports:
       - "5434:5432"
 
-  db_expense:
+  db_stroski:
     image: postgres:17
     container_name: db_stroski
     environment:
@@ -81,7 +77,7 @@ services:
     ports:
       - "5435:5432"
 
-  db_analysis:
+  db_analiza:
     image: postgres:17
     container_name: db_analiza
     environment:

@@ -3,11 +3,13 @@ from models import db, User
 from sqlalchemy import text
 from prometheus_client import generate_latest, Counter, Histogram
 import time
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_user:5432/uporabniki'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_uporabniki:5432/uporabniki'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # metrics
@@ -71,7 +73,7 @@ def login_user():
     return jsonify({"message": "Login invalid"}), 401
 
 # profile
-@app.route('/profile')
+@app.route('/profile', methods=['GET'])
 def get_profile():
     return jsonify({"message": "your profile"}), 200
 

@@ -8,6 +8,12 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(80), nullable=False, unique= True)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.group_name
+        }
+
 class GroupMember(db.Model):
     __tablename__ = 'clani'
     id = db.Column(db.Integer, primary_key=True)
