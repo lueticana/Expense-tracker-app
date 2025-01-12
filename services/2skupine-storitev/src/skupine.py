@@ -1,25 +1,40 @@
-from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, request, jsonify, Response
 from sqlalchemy import text
 from models import db, Group, GroupMember
+from prometheus_client import generate_latest, Counter, Histogram
 
 app = Flask(__name__)
 
-# Configurations
+# config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_group:5432/skupine'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'my_jwt_secret_key'
 
-# Initialize extensions
+# metrics
+REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
+REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
+
+# db
 db.init_app(app)
-jwt = JWTManager(app)
 
-# Routes
+# ENDPOINT
+
+# before & after for metrics
+@app.before_request
+def before_request():
+    REQUEST_COUNT.labels(method=request.method, endpoint=request.path).inc()
+    request.start_time = REQUEST_LATENCY.labels(endpoint=request.path).time()
+
+@app.after_request
+def after_request(response):
+    request.start_time.observe_duration()
+    return response
+
+# home
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({"message": "Groups page"}), 201
 
-
+# create group
 @app.route('/groups', methods=['POST'])
 def create_group():
     # data = request.json
@@ -34,41 +49,7 @@ def create_group():
     # return jsonify({"message": "Group created successfully"}), 201
     return jsonify({"message": "Add group page"}), 201
 
-
-# @app.route('/groups/<int:group_id>/add-member', methods=['POST'])
-# @jwt_required()
-# def add_member(group_id):
-#     data = request.json
-#     user_id = data.get('user_id')
-
-#     group = Group.query.get(group_id=group_id)
-#     if not group:
-#         return jsonify({"error": "Invalid group id"}), 401
-    
-#     if GroupMember.query.filter_by(group_id=group_id, user_id=user_id).first():
-#         return jsonify({"error": "User is already a member"}), 400
-    
-#     new_member = GroupMember(group_id=group_id, user_id=user_id)
-#     db.session.add(new_member)
-#     db.session.commit()
-#     return jsonify({"message": "Member added to group"}), 200
-
-# @app.route('/group/<int:group_id>', methods=['GET'])
-# @jwt_required()
-# def get_group(group_id):
-#     group = Group.query.get(group_id=group_id)
-
-#     if not group:
-#         return jsonify({"error": "Invalid group id"}), 404
-    
-#     members = GroupMember.query.filter_by(group_id=group_id).all()
-#     members_list = [{"username": member.username, "email": member.email, "user_id": member.id} for member in members]
-#     return jsonify({
-#         "group_id": group_id,
-#         "group_name": group.group_name,
-#         "members": members_list 
-#     }), 200
-
+# health: can it execute in db
 @app.route('/health', methods=['GET'])
 def health_check():
     try:
@@ -76,7 +57,22 @@ def health_check():
         return jsonify({"status": "healthy"}), 200
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
+    
+# readiness: db connection
+def is_database_connected():
+    return True
 
+@app.route('/readiness', methods=['GET'])
+def readiness_check():
+    if is_database_connected():
+        return jsonify({"status": "ready"}), 200
+    else:
+        return jsonify({"status": "not ready"}), 500
+ 
+# metrics
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    return Response(generate_latest(), mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)

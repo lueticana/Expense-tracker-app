@@ -1,24 +1,40 @@
-from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, request, jsonify, Response
 from sqlalchemy import text
 from models import db, Expense
+from prometheus_client import generate_latest, Counter, Histogram
 
 app = Flask(__name__)
 
-# Configurations
+# config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_expense:5432/stroski'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'my_jwt_secret_key'
 
-# Initialize extensions
+# metrics
+REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
+REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
+
+# db
 db.init_app(app)
-jwt = JWTManager(app)
 
-# Routes
+# ENDPOINT
+
+# before & after for metrics
+@app.before_request
+def before_request():
+    REQUEST_COUNT.labels(method=request.method, endpoint=request.path).inc()
+    request.start_time = REQUEST_LATENCY.labels(endpoint=request.path).time()
+
+@app.after_request
+def after_request(response):
+    request.start_time.observe_duration()
+    return response
+
+# home
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({"message": "Expenses page"}), 201
 
+# add expense
 @app.route('/expenses', methods=['POST'])
 def add_expense():
     # data = request.json
@@ -39,18 +55,7 @@ def add_expense():
     # return jsonify({"message": "Expense added successfully", "expense_id": new_expense.id}), 201
     return jsonify({"message": "Add expense page"}), 201
 
-
-# @app.route('/expenses', methods=['GET'])
-# @jwt_required
-# def get_expenses():
-
-#     current_user = get_jwt_identity()
-#     expenses = Expense.query.filter_by(payer_id=current_user['id']).all()
-
-#     expenses_list = [{"id":expense.id, "description": expense.description, "amount": expense.amount} for expense in expenses]
-
-#     return jsonify(expenses_list), 200
-
+# health: can it execute in db
 @app.route('/health', methods=['GET'])
 def health_check():
     try:
@@ -58,6 +63,22 @@ def health_check():
         return jsonify({"status": "healthy"}), 200
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
+    
+# readiness: db connection
+def is_database_connected():
+    return True
+
+@app.route('/readiness', methods=['GET'])
+def readiness_check():
+    if is_database_connected():
+        return jsonify({"status": "ready"}), 200
+    else:
+        return jsonify({"status": "not ready"}), 500
+ 
+# metrics
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    return Response(generate_latest(), mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5002)

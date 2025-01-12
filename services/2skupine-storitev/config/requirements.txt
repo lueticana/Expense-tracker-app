@@ -3,5 +3,5 @@ Flask-JWT-Extended==4.4.0
 Flask-SQLAlchemy==3.0.5
 SQLAlchemy==2.0
 Werkzeug==2.3.7
-psycopg2-binary==2.9.7  # For PostgreSQL (use only if applicable)
-python-dotenv==1.0.0    # Optional for environment variables
+psycopg2-binary==2.9.7
+prometheus-client==0.16.0

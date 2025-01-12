@@ -1,29 +1,40 @@
-from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask import Flask, request, jsonify, Response
 from sqlalchemy import text
 from models import db
+from prometheus_client import generate_latest, Counter, Histogram
 
 app = Flask(__name__)
 
-# Configurations
+# config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123121@db_analysis:5432/analiza'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'my_jwt_secret_key'
 
-# Initialize extensions
+# metrics
+REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
+REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
+
+# db
 db.init_app(app)
-jwt = JWTManager(app)
 
-# Routes
+# ENDPOINT
+
+# before & after for metrics
+@app.before_request
+def before_request():
+    REQUEST_COUNT.labels(method=request.method, endpoint=request.path).inc()
+    request.start_time = REQUEST_LATENCY.labels(endpoint=request.path).time()
+
+@app.after_request
+def after_request(response):
+    request.start_time.observe_duration()
+    return response
+
+# home
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({"message": "Analysis page"}), 201
 
-# @app.route('/analysis', methods=['GET'])
-# @jwt_required()
-# def total_expenses():
-#     return jsonify({"total_expenses": 0}), 200
-
+# health: can it execute in db
 @app.route('/health', methods=['GET'])
 def health_check():
     try:
@@ -32,6 +43,21 @@ def health_check():
     except Exception as e:
         return jsonify({"status": "unhealthy", "error": str(e)}), 500
 
+# readiness: db connection
+def is_database_connected():
+    return True
+
+@app.route('/readiness', methods=['GET'])
+def readiness_check():
+    if is_database_connected():
+        return jsonify({"status": "ready"}), 200
+    else:
+        return jsonify({"status": "not ready"}), 500
+
+# metrics
+@app.route('/metrics', methods=['GET'])
+def metrics():
+    return Response(generate_latest(), mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5003)
