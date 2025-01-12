@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analiza-deployment
+  labels:
+    app: analiza
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: analiza
+  template:
+    metadata:
+      labels:
+        app: analiza
+    spec:
+      containers:
+      - name: analiza
+        image: al96152/analiza:v1.0
+        ports:
+        - containerPort: 5003
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5003
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 5003
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
