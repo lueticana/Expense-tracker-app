@@ -4,6 +4,7 @@ services:
       context: ./services/1uporabniki-storitev
       dockerfile: ./config/Dockerfile
     container_name: uporabniki_storitev
+    image: al96152/uporabniki:latest
     ports:
       - "5000:5000"
     environment:
@@ -16,6 +17,7 @@ services:
       context: ./services/2skupine-storitev
       dockerfile: ./config/Dockerfile
     container_name: skupine_storitev
+    image: al96152/skupine:latest
     ports:
       - "5001:5001"
     environment:
@@ -28,6 +30,7 @@ services:
       context: ./services/3stroski-storitev
       dockerfile: ./config/Dockerfile
     container_name: stroski_storitev
+    image: al96152/stroski:latest
     ports:
       - "5002:5002"
     environment:
@@ -40,6 +43,7 @@ services:
       context: ./services/4analiza-storitev
       dockerfile: ./config/Dockerfile
     container_name: analiza_storitev
+    image: al96152/analiza:latest
     ports:
       - "5003:5003"
     environment:

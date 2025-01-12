@@ -56,14 +56,9 @@ cd expense-tracker
 ```
 ## Docker commands
 ```bash
-docker build -t al96152/uporabniki ./uporabniki
-docker push al96152/uporabniki
-docker build -t al96152/skupine ./skupine
-docker push al96152/skupine
-docker build -t al96152/stroski ./stroski
-docker push al96152/stroski
-docker build -t al96152/analiza ./analiza
-docker push al96152/analiza
+docker compose build
+docker compose push
+docker compose up
 ```
 ## Deploy to Azure Kubernetes Service using Helm
 ```bash
