@@ -1,0 +1,8 @@
+server:
+  extraScrapeConfigs:
+    - job_name: 'uporabniki'
+      metrics_path: '/metrics'
+      scheme: 'http'
+      static_configs:
+        - targets:
+          - 'uporabniki-service.default.svc.cluster.local:5000'
