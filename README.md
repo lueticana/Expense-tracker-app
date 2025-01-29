@@ -62,10 +62,10 @@ docker compose up
 ```
 ## Deploy to Azure Kubernetes Service using Helm
 ```bash
-helm install uporabniki ./helm/uporabniki preveriiiiiii!!!!!!!!!!
-helm install skupine ./helm/skupine preveriiiiiii!!!!!!!!!!
-helm install stroski ./helm/stroski preveriiiiiii!!!!!!!!!!
-helm install analiza ./helm/analiza preveriiiiiii!!!!!!!!!!
+helm install uporabniki-release ./service/1uporabniki-storitev/config/helm
+helm install skupine-release ./service/2skupine-storitev/config/helm
+helm install stroski-release ./service/3stroski-storitev/config/helm
+helm install analiza-release ./service/4analiza-storitev/config/helm
 ```
 ## Prometheus (optional)
 ```bash
@@ -75,6 +75,6 @@ helm install prometheus ./helm/prometheus
 ## Run the React GUI
 ```bash
 cd GUI
-npm install
-npm start
+npm run build
+npm run dev
 ```
