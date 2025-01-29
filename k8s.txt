@@ -1,0 +1,33 @@
+KUBERNETES
+az account show
+az aks get-credentials --name expense_tracker --resource-group expense_tracker_group
+kubectl config current-context
+
+kubectl get nodes
+kubectl get pods
+
+kubectl get deployments
+
+kubectl expose deployment uporabniki --type=LoadBalancer --port=80 --target-port=80
+
+kubectl get service 
+external ip v browser
+
+>kubectl get namespace
+
+kubectl delete deployment uporabniki-deployment
+
+kubectl get service
+
+kubectl apply -f uporabniki-deployment.yaml
+kubectl apply -f uporabniki-service.yaml
+
+kubectl describe service uporabniki-service
+
+kubectl get deployment uporabniki-deployment -o yaml
+
+
+
+
+helm install uporabniki-release helm
+helm upgrade uporabniki-release helm/ --values helm/values.yaml
