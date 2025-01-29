@@ -1,0 +1,5 @@
+-choose profile pic
+-add expense in GUI
+-not working: AKS workflow
+-not working: kafka
+-serverless-hello

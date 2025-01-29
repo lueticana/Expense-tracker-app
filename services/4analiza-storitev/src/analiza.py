@@ -4,6 +4,8 @@ from models import db
 from prometheus_client import generate_latest, Counter, Histogram
 import time
 from flask_cors import CORS
+#from confluent_kafka import Consumer
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -16,10 +18,40 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
 REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
 
+# #kafka
+# consumer = Consumer({
+#     'bootstrap.servers': 'localhost:9092',
+#     'group.id': 'analysis-group',
+#     'auto.offset.reset': 'earliest'
+# })
+
+# consumer.subscribe(['expenses-to-analysis'])
+
+# def process_expenses():
+#     try:
+#         while True:
+#             msg = consumer.poll(1.0)
+#             if msg is None:
+#                 continue
+#             if msg.error():
+#                 print(f"Consumer error: {msg.error()}")
+#                 continue
+
+#             # Process the message
+#             expense_data = json.loads(msg.value().decode('utf-8'))
+#             print(f"Received data: {expense_data}")
+#     except KeyboardInterrupt:
+#         pass
+#     finally:
+#         consumer.close()
+
+# # Example usage
+# #process_expenses()
+
 # db
 db.init_app(app)
 
-# ENDPOINT
+# ENDPOINTs
 
 # before & after for metrics
 @app.before_request
