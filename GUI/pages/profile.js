@@ -46,6 +46,7 @@ export default function MyProfile() {
           />
         ))}
       </div>
+      <Link href="/">Back to home</Link>
     </div>
   );
 }
