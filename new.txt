@@ -3,3 +3,5 @@
 -not working: AKS workflow
 -not working: kafka
 -serverless-hello
+-helm charts
+-AKS: deployment successful
