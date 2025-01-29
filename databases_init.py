@@ -114,19 +114,15 @@ cur = conn_stroski.cursor()
 cur.execute('DROP TABLE IF EXISTS stroski;')
 cur.execute('CREATE TABLE stroski (id serial PRIMARY KEY,'
                                  'description varchar (100) NOT NULL,'
-                                 'amount integer NOT NULL,'
-                                 'group_id integer,'
-                                 'payer_id integer NOT NULL);'
+                                 'amount integer NOT NULL);'
                                  )
 
 # Insert data into the table
 
-cur.execute('INSERT INTO stroski (description, amount, group_id, payer_id)'
-            'VALUES (%s, %s, %s, %s);',
+cur.execute('INSERT INTO stroski (description, amount)'
+            'VALUES (%s, %s);',
             ('test_description1',
-             100,
-             1,
-             2
+             100
             ))
 
 conn_stroski.commit()

@@ -6,7 +6,7 @@ export default function Analysis() {
     const [data, setData] = useState([{}])
     
         useEffect(() => {
-            fetch("http://localhost:5003/analysis"
+            fetch("http://localhost:5003/"
             ).then(
                 res => res.json()
             ).then(

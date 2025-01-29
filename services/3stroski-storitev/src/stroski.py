@@ -4,6 +4,10 @@ from models import db, Expense
 from prometheus_client import generate_latest, Counter, Histogram
 import time
 from flask_cors import CORS
+#from confluent_kafka import Producer
+import json
+import psycopg2
+
 
 app = Flask(__name__)
 CORS(app)
@@ -16,10 +20,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
 REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
 
+# # kafka
+# producer = Producer({'bootstrap.servers': 'localhost:9092'})
+
+# def send_to_analysis(expense_data):
+#     try:
+#         producer.produce('expenses-to-analysis', json.dumps(expense_data).encode('utf-8'))
+#         producer.flush()
+#         print("Message sent to analysis")
+#     except Exception as e:
+#         print(f"Failed to send message: {e}")
+
 # db
 db.init_app(app)
 
-# ENDPOINT
+# ENDPOINTs
 
 # before & after for metrics
 @app.before_request
@@ -41,23 +56,56 @@ def home():
 # add expense
 @app.route('/expenses', methods=['POST'])
 def add_expense():
-    # data = request.json
-    # description = data.get('description')
-    # amount = data.get('amount_in_eur')
-    # group_id = data.get('group_id')
-    # payer_id = data.get('payer_id')
+    
+    data = request.json
+    print(data)
+    description = data.get('description')
+    amount = data.get('amount')
 
-    # if not description or not amount:
-    #     return jsonify({"error": "Description and amount are required"}), 400
+    if not description or not amount:
+        return jsonify({"error": "Description and amount are required"}), 400
 
-    # if amount <= 0:
-    #     return jsonify({"error": "Amount must be greater than zero"}), 400
+    if amount <= 0:
+        return jsonify({"error": "Amount must be greater than zero"}), 400
 
-    # new_expense = Expense(description=description, amount=amount, group_id=group_id, payer_id=payer_id)
+    # db.session.execute(text('INSERT INTO stroski (description, amount)'
+    #         'VALUES (%s, %s);',
+    #         (description,
+    #          amount
+    #         )))
+
+
+    conn_stroski = psycopg2.connect(
+        host="db_stroski:5432",
+        database="stroski",
+        user="postgres",
+        password="123121")
+
+        # Open a cursor to perform database operations
+    cur = conn_stroski.cursor()
+
+    # Insert data into the table
+
+    cur.execute('INSERT INTO stroski (description, amount)'
+            'VALUES (%s, %s);',
+            (description,
+             amount
+            ))
+
+    conn_stroski.commit()
+
+    cur.close()
+    conn_stroski.close()
+
+    # new_expense = Expense(description=description, amount=amount)
     # db.session.add(new_expense)
     # db.session.commit()
-    # return jsonify({"message": "Expense added successfully", "expense_id": new_expense.id}), 201
-    return jsonify({"message": "Add expense page"}), 201
+
+    #send_to_analysis(data)
+
+    return jsonify({"message": "Expense added successfully"}), 201
+
+    #return jsonify({"message": "Add expense page"}), 201
 
 # health: can it execute in db
 @app.route('/health', methods=['GET'])

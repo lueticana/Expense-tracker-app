@@ -8,5 +8,3 @@ class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String, nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    group_id = db.Column(db.Integer, nullable=True)
-    payer_id = db.Column(db.Integer, nullable=False)

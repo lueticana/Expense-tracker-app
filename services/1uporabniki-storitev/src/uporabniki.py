@@ -4,6 +4,8 @@ from sqlalchemy import text
 from prometheus_client import generate_latest, Counter, Histogram
 import time
 from flask_cors import CORS
+from flask import Flask, request, jsonify
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +17,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # metrics
 REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['method', 'endpoint'])
 REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency', ['endpoint'])
+
+# unisplash
+UNSPLASH_API_KEY = "WxNn_H16C8GLyaVYWpgS3Q34bmPwzXaBd2vVbU8qQrA"
 
 # db
 db.init_app(app)
@@ -75,7 +80,16 @@ def login_user():
 # profile
 @app.route('/profile', methods=['GET'])
 def get_profile():
-    return jsonify({"message": "your profile"}), 200
+    query = request.args.get('query', 'random')  # Default to 'random' if no query
+    url = f"https://api.unsplash.com/search/photos?query={query}&client_id={UNSPLASH_API_KEY}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise error if the request fails
+        photos = response.json()
+        return jsonify(photos)
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
 # health: can it execute in db
 @app.route('/health', methods=['GET'])
